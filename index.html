@@ -1,160 +1,85 @@
 <!doctype html>
 <html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#173c38">
-<title>星野馴獸師｜像素冒險</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#173c38"><title>星野馴獸師 3D｜原型 0.2</title>
 <style>
-:root{--ink:#193a35;--cream:#fff4cc;--gold:#f4cc67;--panel:#183b38;--mint:#bde8b4}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#122e30;color:var(--cream);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;overscroll-behavior:none}
-body{padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom);display:flex;justify-content:center}
-.app{width:min(100%,520px);padding:10px 0 18px}
-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
-h1{font-size:clamp(17px,5vw,24px);margin:0;color:#ffe39a;text-shadow:2px 2px #704a35}
-.sub{font-size:10px;color:#c4e6c6;margin-top:4px}
-.pill{background:#234b43;border:2px solid #7cae7b;border-radius:8px;padding:7px 9px;font-size:12px;white-space:nowrap}
-.frame{border:4px solid #f3d88d;border-radius:10px;background:#244d40;padding:5px;box-shadow:0 5px 0 #091c20}
-canvas{display:block;width:100%;height:auto;image-rendering:pixelated;border:2px solid #122e30;background:#8acb7a;touch-action:none}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}
-.stat{background:#193b37;border:2px solid #668f69;padding:8px;border-radius:7px;font-size:11px;line-height:1.6}
-.stat b{color:#ffdf84}
-.message{min-height:57px;background:#183b38;border:2px solid #d5c27c;border-radius:8px;padding:10px;font-size:12px;line-height:1.5;margin:8px 0}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.pad,.actions{background:#193b37;border:2px solid #557e62;border-radius:8px;padding:8px}
-.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;align-content:center}
-button{font:inherit;color:#fff4cc;background:#315d4c;border:2px solid #8eb782;border-radius:7px;min-height:43px;padding:8px 5px;box-shadow:0 3px 0 #102923;touch-action:manipulation}
-button:active{transform:translateY(2px);box-shadow:0 1px 0 #102923;background:#46785a}
-.pad button{font-size:19px;min-height:44px}
-.pad .blank{visibility:hidden}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.actions button{font-size:11px}
-.actions button.primary{background:#93613c;border-color:#f4ce78}
-.footer{font-size:10px;color:#9fc5ad;text-align:center;margin-top:10px;line-height:1.6}
-.modal{position:fixed;inset:0;background:#071a1acc;display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
-.modal.show{display:flex}.card{width:min(100%,440px);background:#183b38;border:3px solid #f3d88d;border-radius:10px;padding:16px;box-shadow:0 7px #071a1a}
-.card h2{font-size:18px;color:#ffe39a;margin:0 0 12px}.card p{font-size:12px;line-height:1.7}
-.monsterRow{display:flex;justify-content:space-between;gap:8px;border:1px solid #6c9d70;padding:9px;margin:6px 0;border-radius:6px;font-size:12px}
-.card button{width:100%;margin-top:8px}
-@media(min-width:440px){.controls{grid-template-columns:1fr 1fr}.app{padding-top:18px}}
-</style>
-</head>
-<body>
-<div class="app">
-<header><div><h1>✦ 星野馴獸師</h1><div class="sub">PIXEL MONSTER ADVENTURE · 原創遊戲原型</div></div><div class="pill">★ <span id="coins">20</span></div></header>
-<div class="frame"><canvas id="scene" width="320" height="360" aria-label="像素草原遊戲畫面"></canvas></div>
-<div class="stats">
- <div class="stat"><b id="heroName">焰尾狐 Lv.1</b><br>HP <span id="heroHp">24/24</span><br><span id="partyCount">隊伍：1 隻</span></div>
- <div class="stat"><b id="areaName">星野草原</b><br>藥水 <span id="potions">2</span><br>收服 <span id="caught">0</span> 隻</div>
-</div>
-<div class="message" id="message" role="status">歡迎來到星野草原！使用方向鍵移動，探索草叢尋找新夥伴。</div>
-<div class="controls">
- <div class="pad">
-  <button class="blank">　</button><button data-move="up" aria-label="向上">▲</button><button class="blank">　</button>
-  <button data-move="left" aria-label="向左">◀</button><button data-move="down" aria-label="向下">▼</button><button data-move="right" aria-label="向右">▶</button>
- </div>
- <div class="actions">
-  <button class="primary" id="interact">探索／互動</button>
-  <button id="attack">攻擊</button>
-  <button id="catch">嘗試收服</button>
-  <button id="potion">使用藥水</button>
-  <button id="team">怪獸隊伍</button>
-  <button id="bag">背包</button>
-  <button id="save">保存進度</button>
-  <button id="reset">重新開始</button>
- </div>
-</div>
-<div class="footer">原創像素冒險原型 v0.1 · 進度保存在此瀏覽器<br>正式上架前仍需完成測試、隱私政策與 iOS 打包。</div>
-</div>
-<div class="modal" id="modal"><div class="card"><h2 id="modalTitle">隊伍</h2><div id="modalBody"></div><button id="closeModal">返回遊戲</button></div></div>
+:root{--panel:rgba(17,42,48,.9);--cream:#fff4cc;--gold:#ffd86a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#9bd8ef;color:#fff;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;touch-action:none}
+#game{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}
+#hud{position:fixed;inset:0;padding:calc(8px + env(safe-area-inset-top)) 10px calc(8px + env(safe-area-inset-bottom));pointer-events:none}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.panel{background:var(--panel);border:2px solid #ffffff45;border-radius:14px;padding:8px 10px;box-shadow:0 4px 0 #102a2d55;backdrop-filter:blur(6px)}
+.brand{font-size:clamp(14px,4vw,19px);font-weight:1000;color:var(--cream)}.small{font-size:11px;opacity:.9}
+#status{min-width:145px;font-size:12px}.bar{height:7px;background:#4c4344;border-radius:8px;overflow:hidden;margin-top:3px}.fill{height:100%;width:100%;background:linear-gradient(90deg,#5fe5a0,#d5f76c)}#monsterFill{background:linear-gradient(90deg,#6de5fa,#a7a4ff)}
+#quest{position:absolute;top:84px;left:10px;max-width:230px;font-size:12px;line-height:1.45}#quest b{color:#ffe18b}
+#message{position:absolute;top:26%;left:50%;transform:translateX(-50%);max-width:90vw;width:max-content;text-align:center;font-weight:900;background:var(--panel);border:2px solid #ffffff55;border-radius:14px;padding:8px 12px;opacity:0;transition:opacity .2s}#message.show{opacity:1}
+#bottom{position:absolute;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom));display:flex;align-items:flex-end;justify-content:space-between;padding:0 8px;gap:6px}
+#stickZone{width:132px;height:132px;position:relative;pointer-events:auto;touch-action:none;flex-shrink:0}#stickBase{position:absolute;inset:7px;border-radius:50%;background:#12353a55;border:2px solid #ffffff80;box-shadow:inset 0 0 0 8px #ffffff0c}#stick{position:absolute;left:39px;top:39px;width:48px;height:48px;border-radius:50%;background:#fff4cced;border:3px solid white;box-shadow:0 4px 0 #0003}
+.actions{display:flex;gap:6px;align-items:flex-end;pointer-events:auto}.action{width:59px;height:61px;border:2px solid #ffffffdf;border-radius:17px;background:linear-gradient(#ffe48d,#ff9f55);color:#50392d;font-size:11px;font-weight:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:0 5px 0 #0003;touch-action:manipulation}.action.blue{background:linear-gradient(#b6f4ff,#5fc7e9);color:#143f50}.action.green{background:linear-gradient(#baf6a4,#6fce87);color:#173e34}.action:active{transform:translateY(3px);box-shadow:0 2px 0 #0003}
+#help{position:absolute;bottom:150px;left:50%;transform:translateX(-50%);font-size:10px;white-space:nowrap;background:#112a30b8;padding:5px 9px;border-radius:20px}
+#start{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:linear-gradient(#0c313a22,#0d2a2acc);padding:20px}.card{width:min(460px,100%);background:#103032f2;border:3px solid #fff1bd;border-radius:23px;padding:22px 18px;text-align:center;box-shadow:0 12px 0 #081d1f40}.logo{font-size:clamp(28px,8vw,42px);font-weight:1000;color:#ffe28a;text-shadow:0 4px 0 #a75d3c}.card p{line-height:1.6;color:#e7f7e9;font-size:14px}#startBtn{border:0;border-radius:14px;background:linear-gradient(#ffe48d,#ffb34e);padding:14px 20px;font-size:18px;font-weight:1000;color:#50392d;width:100%;box-shadow:0 5px 0 #a75d3c}
+#toast{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);background:#173c38;color:#fff4cc;border:2px solid white;border-radius:14px;padding:10px 15px;font-weight:900;opacity:0;pointer-events:none;transition:opacity .15s;z-index:6;text-align:center;max-width:88vw}
+#toast.on{opacity:1}
+#book{position:fixed;inset:0;background:#061d22b8;z-index:7;display:none;align-items:center;justify-content:center;padding:18px;pointer-events:auto}
+#book .sheet{width:min(430px,100%);max-height:80vh;overflow:auto;background:#173c38;border:3px solid #ffe28a;border-radius:20px;padding:16px}
+.sheet h2{margin:0 0 8px;color:#ffe28a}.sheet button{border:0;border-radius:10px;padding:10px 14px;background:#ffe28a;font-weight:900;color:#50392d}.entry{padding:9px;margin:6px 0;background:#ffffff12;border-radius:10px;font-size:13px}
+@media(min-width:700px){#stickZone{width:145px;height:145px}#stick{left:46px;top:46px}.action{width:68px;height:68px;font-size:12px}#help{bottom:170px}}
+</style></head><body>
+<div id="game"></div><div id="hud">
+ <div class="row"><div class="panel"><div class="brand">✦ 星野馴獸師 3D</div><div class="small">第二階段・星芽草原</div></div><div class="panel" id="status"><div style="display:flex;justify-content:space-between;font-weight:900"><span>♥ 冒險者</span><span id="hptext">100/100</span></div><div class="bar"><div class="fill" id="hpFill"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px;font-weight:800"><span>✦ 星芽獸</span><span id="levelText">Lv.1</span></div><div class="bar"><div class="fill" id="monsterFill"></div></div></div></div>
+ <div class="panel" id="quest"><b>主線任務 01</b><br><span id="questText">和草原嚮導對話（走近藍色旗幟）</span><br><span id="questProgress">進度：0 / 1</span></div>
+ <div id="message">歡迎來到星芽草原！</div><div id="help">搖桿移動・接近 NPC 互動・削弱怪獸後馴服</div>
+ <div id="bottom"><div id="stickZone"><div id="stickBase"></div><div id="stick"></div></div><div class="actions">
+ <button class="action blue" id="bookBtn">📖<br>圖鑑</button><button class="action green" id="interactBtn">💬<br>互動</button><button class="action blue" id="skillBtn">✦<br>星光波</button><button class="action" id="attackBtn">⚔<br>攻擊</button><button class="action" id="captureBtn">✧<br>馴服</button>
+ </div></div></div>
+<div id="start"><div class="card"><div class="logo">星野馴獸師</div><div style="font-weight:900;color:#b8efff">3D 怪獸冒險｜原型 0.2</div><p>第二階段新增：主線任務、草原嚮導 NPC、怪獸圖鑑、捕捉紀錄與本機存檔。<br>手機用左下搖桿；電腦用 WASD／方向鍵移動，空白鍵攻擊、E 馴服、Q 技能、F 互動、B 圖鑑。</p><button id="startBtn">開始冒險 ▶</button><p style="font-size:11px;opacity:.72">原型仍在開發中；本機存檔只存在目前瀏覽器。</p></div></div>
+<div id="toast"></div><div id="book"><div class="sheet"><h2>✦ 怪獸圖鑑</h2><div id="bookContent"></div><button id="closeBook">關閉</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-(() => {
-const canvas=document.getElementById('scene'),ctx=canvas.getContext('2d');
-ctx.imageSmoothingEnabled=false;
-const $=id=>document.getElementById(id);
-const initial=()=>({x:8,y:8,steps:0,coins:20,potions:2,caught:0,mode:'world',enemy:null,team:[{name:'焰尾狐',hp:24,max:24,power:7,level:1,color:'#ed8854',accent:'#ffd16c'}]});
-let s=initial(), lastMove=0;
-const wild=[
- {name:'草芽獸',hp:17,power:4,color:'#72bd70',accent:'#d5f18b'},
- {name:'泡泡團',hp:15,power:3,color:'#68bce0',accent:'#d4f4ff'},
- {name:'石甲仔',hp:21,power:5,color:'#a4a9a6',accent:'#e4d5a0'},
- {name:'星耳兔',hp:14,power:4,color:'#d6a0d9',accent:'#ffe2f4'}
-];
-function message(t){$('message').textContent=t}
-function save(){try{localStorage.setItem('starfield_save_v1',JSON.stringify(s));message('進度已保存！下次在同一個瀏覽器開啟還能繼續冒險。')}catch(e){message('目前瀏覽器未允許保存資料，請確認 Safari 的網站資料設定。')}update()}
-function load(){try{const d=localStorage.getItem('starfield_save_v1');if(d){const obj=JSON.parse(d);if(obj&&obj.team&&obj.team.length)s={...initial(),...obj};}}catch(e){}}
-function update(){
- $('coins').textContent=s.coins;$('heroName').textContent=`${s.team[0].name} Lv.${s.team[0].level}`;
- $('heroHp').textContent=`${s.team[0].hp}/${s.team[0].max}`;$('partyCount').textContent=`隊伍：${s.team.length} 隻`;
- $('potions').textContent=s.potions;$('caught').textContent=s.caught;
- $('areaName').textContent=s.mode==='battle'?'遭遇戰':'星野草原';
- draw();
-}
-function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)}
-function creature(x,y,color,accent,scale=1){
- const p=scale;rect(x-8*p,y-3*p,16*p,13*p,color);rect(x-7*p,y-9*p,5*p,8*p,accent);rect(x+2*p,y-10*p,5*p,9*p,accent);
- rect(x-5*p,y+8*p,4*p,4*p,color);rect(x+3*p,y+8*p,4*p,4*p,color);
- rect(x-5*p,y+1*p,2*p,2*p,'#202936');rect(x+3*p,y+1*p,2*p,2*p,'#202936');rect(x-2*p,y+6*p,5*p,2*p,'#a94b4a');
-}
-function draw(){
- // pixel meadow
- rect(0,0,320,360,'#8fd1e7');rect(0,65,320,295,'#8acb78');
- for(let i=0;i<6;i++){rect(i*62-18,63,40,22,'#71b96f');rect(i*62-8,48,24,30,'#71b96f');rect(i*62+2,39,14,25,'#78c477')}
- // tiled grass patches
- for(let i=0;i<45;i++){let x=(i*53+11)%315,y=(i*37+95)%250+80;rect(x,y,3,3,i%3===0?'#d7e89a':i%3===1?'#4e9c5a':'#f7e7a0')}
- // winding path
- ctx.fillStyle='#d9bd82';ctx.beginPath();ctx.moveTo(105,360);ctx.lineTo(138,220);ctx.lineTo(185,170);ctx.lineTo(205,170);ctx.lineTo(166,240);ctx.lineTo(153,360);ctx.closePath();ctx.fill();
- // trees
- [[35,115],[278,128],[45,255],[272,270],[86,178],[238,325]].forEach(([x,y])=>{rect(x-4,y+12,8,18,'#795638');rect(x-14,y-4,28,23,'#2d7849');rect(x-10,y-14,20,18,'#3c9952');rect(x-5,y-20,10,12,'#57b85f')});
- // chest
- rect(208,92,25,19,'#8b4b2b');rect(208,92,25,6,'#d88a3d');rect(218,98,4,8,'#f8df79');
- // player
- const px= Math.max(15,Math.min(305,s.x*18+7)),py=Math.max(90,Math.min(342,s.y*17+92));
- rect(px-6,py-9,12,12,'#f1c59a');rect(px-7,py-13,14,6,'#714b37');rect(px-8,py+2,16,12,'#356cbd');rect(px-6,py+14,5,6,'#3b354d');rect(px+2,py+14,5,6,'#3b354d');rect(px-3,py-5,2,2,'#202936');rect(px+2,py-5,2,2,'#202936');
- creature(px+17,py+9,'#ed8854','#ffd16c',.7);
- rect(8,8,160,22,'#183b38');ctx.strokeStyle='#f3d88d';ctx.lineWidth=2;ctx.strokeRect(8,8,160,22);
- ctx.fillStyle='#ffe39a';ctx.font='10px monospace';ctx.fillText(s.mode==='battle'?'遭遇戰！':'星野草原',15,22);
- if(s.mode==='battle'&&s.enemy){
-  rect(16,42,288,110,'#183b38');ctx.strokeStyle='#f3d88d';ctx.strokeRect(16,42,288,110);
-  ctx.fillStyle='#fff4cc';ctx.font='12px monospace';ctx.fillText(s.enemy.name,27,61);
-  ctx.fillStyle='#bde8b4';ctx.font='10px monospace';ctx.fillText(`HP ${s.enemy.hp}/${s.enemy.max}`,27,78);
-  rect(27,85,120,7,'#40534a');rect(27,85,120*s.enemy.hp/s.enemy.max,7,'#75d46f');
-  creature(245,104,s.enemy.color,s.enemy.accent,1.6);
-  ctx.fillStyle='#ffe39a';ctx.fillText('下方按鈕選擇行動',27,132);
- }
-}
-function move(dir){
- if(s.mode!=='world')return;
- const d={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[dir];s.x=Math.max(0,Math.min(15,s.x+d[0]));s.y=Math.max(0,Math.min(14,s.y+d[1]));s.steps++;
- if(s.steps%5===0){const w=wild[Math.floor(Math.random()*wild.length)];s.enemy={...w,max:w.hp};s.mode='battle';message(`野生的${w.name}出現了！先削弱牠，再嘗試收服。`)}
- else message(['草葉隨風搖動……','遠處傳來奇怪的叫聲。','你看見草叢輕輕晃動。','繼續探索，也許會遇到新夥伴！'][Math.floor(Math.random()*4)]);
- update();
-}
-function attack(){
- if(s.mode!=='battle')return message('先在草原探索，遇到野生怪獸後才能攻擊。');
- const dmg= Math.max(3,Math.floor(Math.random()*5)+s.team[0].power-3);s.enemy.hp=Math.max(0,s.enemy.hp-dmg);
- if(s.enemy.hp===0){s.coins+=8;s.team[0].level++;s.team[0].power++;s.mode='world';s.enemy=null;message(`勝利！焰尾狐升級了，獲得 8 枚星幣！`)}
- else {const hit=s.enemy.power;s.team[0].hp=Math.max(0,s.team[0].hp-hit);if(!s.team[0].hp){s.team[0].hp=s.team[0].max;s.mode='world';s.enemy=null;message('焰尾狐需要休息，已恢復體力。')}else message(`造成 ${dmg} 點傷害！對方反擊，你受到 ${hit} 點傷害。`)}
- update();
-}
-function catchMonster(){
- if(s.mode!=='battle')return message('遇到野生怪獸後，才能嘗試收服。');
- if(s.enemy.hp>s.enemy.max*.55){s.team[0].hp=Math.max(1,s.team[0].hp-s.enemy.power);message('怪獸還很有精神！先攻擊幾次，再試著收服。')}
- else if(Math.random()<.68){const e=s.enemy;s.team.push({name:e.name,hp:18,max:18,power:5,level:1,color:e.color,accent:e.accent});s.caught++;s.mode='world';s.enemy=null;message(`收服成功！${e.name}加入你的隊伍！`)}
- else {s.team[0].hp=Math.max(1,s.team[0].hp-s.enemy.power);message('差一點就成功了！怪獸趁機反擊，再試一次。')}
- update();
-}
-function potion(){if(s.potions<=0)return message('沒有藥水了！');s.potions--;s.team[0].hp=Math.min(s.team[0].max,s.team[0].hp+10);message('使用藥水，第一隻隊伍怪獸恢復 10 點 HP。');if(s.mode==='battle')s.team[0].hp=Math.max(1,s.team[0].hp-s.enemy.power);update()}
-function modal(title,body){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modal').classList.add('show')}
-document.querySelectorAll('[data-move]').forEach(b=>b.addEventListener('click',()=>move(b.dataset.move)));
-$('interact').onclick=()=>{if(s.mode==='battle'){s.mode='world';s.enemy=null;message('你安全地離開戰鬥。')}else if(Math.abs(s.x-11)+Math.abs(s.y-2)<5){s.coins+=5;message('你打開一個小寶箱，獲得 5 枚星幣！')}else {const w=wild[Math.floor(Math.random()*wild.length)];s.enemy={...w,max:w.hp};s.mode='battle';message(`野生的${w.name}出現了！`)}update()};
-$('attack').onclick=attack;$('catch').onclick=catchMonster;$('potion').onclick=potion;
-$('team').onclick=()=>modal('怪獸隊伍',s.team.map((m,i)=>`<div class="monsterRow"><span>${i===0?'★ ':''}${m.name} Lv.${m.level}<br>HP ${m.hp}/${m.max}</span><span>攻擊力 ${m.power}</span></div>`).join(''));
-$('bag').onclick=()=>modal('冒險者背包',`<p>★ 星幣：${s.coins}</p><p>藥水：${s.potions}</p><p>已收服怪獸：${s.caught} 隻</p><p>探索步數：${s.steps}</p>`);
-$('save').onclick=save;$('reset').onclick=()=>{if(confirm('確定重新開始？目前進度會被清除。')){s=initial();save();message('新冒險開始！走進草叢尋找夥伴吧。');update()}};
-$('closeModal').onclick=()=>$('modal').classList.remove('show');
-load();update();
+(()=> {
+const $=id=>document.getElementById(id), root=$('game');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x9bd8ef);scene.fog=new THREE.Fog(0x9bd8ef,30,100);
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,180);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;root.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xdff8ff,0x59885a,2.0));const sun=new THREE.DirectionalLight(0xfff1cf,2.7);sun.position.set(-15,25,12);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);
+const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.9});
+const grass=mat(0x77c96d),pathMat=mat(0xd8c58d),trunk=mat(0x8b6245),rock=mat(0x8fa6a4),water=mat(0x4fc8dc);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(180,180),grass);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+const path=new THREE.Mesh(new THREE.PlaneGeometry(7,115),pathMat);path.rotation.x=-Math.PI/2;path.position.set(0,.015,-25);scene.add(path);
+const lake=new THREE.Mesh(new THREE.CircleGeometry(8,40),water);lake.rotation.x=-Math.PI/2;lake.position.set(19,.025,-19);scene.add(lake);
+function blob(p,x,y,z,sx,sy,sz,c,cone=false){const m=new THREE.Mesh(cone?new THREE.ConeGeometry(sx,sy,7):new THREE.SphereGeometry(1,12,10),mat(c));m.position.set(x,y,z);m.scale.set(sx,cone?1:sy,sz);m.castShadow=true;p.add(m);return m}
+function tree(x,z,s=1){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);let t=new THREE.Mesh(new THREE.CylinderGeometry(.18*s,.28*s,1.5*s,7),trunk);t.position.y=.75*s;g.add(t);blob(g,0,1.8*s,0,.95*s,1.05*s,.9*s,0x3da96b);blob(g,-.42*s,2.25*s,.1*s,.65*s,.7*s,.62*s,0x61c77d);blob(g,.43*s,2.1*s,-.12*s,.62*s,.7*s,.6*s,0x299b62)}
+for(let i=0;i<76;i++){let x=(Math.random()-.5)*115,z=(Math.random()-.5)*115;if(Math.abs(x)<6&&z<15&&z>-55)continue;if((x-19)**2+(z+19)**2<95)continue;tree(x,z,.65+Math.random()*.75)}
+for(let i=0;i<38;i++){let x=(Math.random()-.5)*85,z=(Math.random()-.5)*85;let r=new THREE.Mesh(new THREE.DodecahedronGeometry(.3+Math.random()*.65),rock);r.position.set(x,.3,z);r.rotation.set(Math.random(),Math.random(),Math.random());scene.add(r)}
+for(let i=0;i<100;i++){let x=(Math.random()-.5)*100,z=(Math.random()-.5)*100;if(Math.abs(x)<5&&z<12&&z>-58)continue;blob(scene,x,.22,z,.05,.2,.05,[0xffe17c,0xffa7b6,0xb9a4ff][i%3],true).rotation.z=Math.PI}
+function makeCritter(color,accent=0xffdf73,scale=1){const g=new THREE.Group();blob(g,0,.6,0,.56*scale,.47*scale,.55*scale,color);blob(g,0,1.02,.12,.36*scale,.34*scale,.34*scale,color);blob(g,-.25*scale,1.33,0,.13*scale,.31*scale,.14*scale,accent,true).rotation.z=-.2;blob(g,.25*scale,1.33,0,.13*scale,.31*scale,.14*scale,accent,true).rotation.z=.2;blob(g,-.13*scale,1.08,.4,.055*scale,.08*scale,.035*scale,0x172c36);blob(g,.13*scale,1.08,.4,.055*scale,.08*scale,.035*scale,0x172c36);blob(g,0,.88,.48,.11*scale,.05*scale,.035*scale,0xff9b91);return g}
+const player=new THREE.Group();scene.add(player);blob(player,0,1.05,0,.42,.62,.32,0x3f83e8);blob(player,0,1.85,0,.43,.43,.4,0xffd3a3);blob(player,-.16,1.9,.34,.06,.09,.035,0x273b54);blob(player,.16,1.9,.34,.06,.09,.035,0x273b54);blob(player,0,2.33,-.02,.48,.16,.42,0x294c8e);blob(player,-.2,2.35,0,.19,.13,.2,0xffdb69);blob(player,.2,2.35,0,.19,.13,.2,0xffdb69);const body=player.children[0];
+const companion=makeCritter(0x62d9d0,0xffe17c,.72);scene.add(companion);companion.position.set(-1.5,0,1.5);
+const enemies=[];const catalog={};
+function spawnEnemy(x,z,color,name,type){const g=makeCritter(color,0xffdf73,.85);g.position.set(x,0,z);scene.add(g);enemies.push({g,hp:60,max:60,name,type,color,alive:true,hit:0})}
+spawnEnemy(3,-7,0xf08b70,'火尾球','火');spawnEnemy(-7,-13,0x9e9af5,'月耳兔','月');spawnEnemy(8,-24,0x72c77d,'苔角獸','草');spawnEnemy(-10,-31,0xf4a5c6,'粉棉狐','風');spawnEnemy(14,-7,0xf1c86a,'金斑獸','光');spawnEnemy(-15,3,0x72c77d,'苔角獸','草');
+function makeNPC(){const g=new THREE.Group();g.position.set(0,0,-4);scene.add(g);blob(g,0,1,0,.38,.58,.3,0xf1a14e);blob(g,0,1.78,0,.38,.38,.36,0xffd3a3);blob(g,0,2.2,-.02,.44,.13,.4,0x4b77a5);blob(g,-.15,1.83,.31,.045,.07,.03,0x233746);blob(g,.15,1.83,.31,.045,.07,.03,0x233746);const flag=new THREE.Group();flag.position.set(1.1,0,0);g.add(flag);const pole=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,2.5,6),mat(0xf7e9bf));pole.position.y=1.25;flag.add(pole);blob(flag,.35,2.1,0,.42,.22,.06,0x3c83ff);return g}
+const npc=makeNPC();
+const clouds=[];for(let i=0;i<8;i++){const g=new THREE.Group();g.position.set((Math.random()-.5)*75,14+Math.random()*8,-45+Math.random()*70);scene.add(g);for(let j=0;j<4;j++){let b=new THREE.Mesh(new THREE.SphereGeometry(1.2+Math.random(),10,8),mat(0xffffff));b.position.set((j-1.5)*1.3,Math.random()*.4,0);g.add(b)}clouds.push(g)}
+let hp=100,level=1,xp=0,coins=0,started=false,joy={x:0,y:0},keys={},last=performance.now(),toastTimer,quest=0,defeated=0,captured=0;
+let discovered={};try{const d=JSON.parse(localStorage.getItem('starfield3d_v02')||'{}');level=d.level||1;xp=d.xp||0;coins=d.coins||0;quest=d.quest||0;defeated=d.defeated||0;captured=d.captured||0;discovered=d.discovered||{}}catch(e){}
+function save(){try{localStorage.setItem('starfield3d_v02',JSON.stringify({level,xp,coins,quest,defeated,captured,discovered}))}catch(e){}}
+function toast(t){$('toast').textContent=t;$('toast').classList.add('on');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('on'),1700)}
+function msg(t){$('message').textContent=t;$('message').classList.add('show');setTimeout(()=>$('message').classList.remove('show'),2300)}
+function nearEnemy(){let best=null,d=999;for(const e of enemies)if(e.alive){let q=e.g.position.distanceTo(player.position);if(q<d){d=q;best=e}}return d<5?best:null}
+function updateQuest(){let text=quest===0?'和草原嚮導對話（走近藍色旗幟）':quest===1?'擊退 2 隻野生怪獸':quest===2?'馴服 1 隻體力較低的怪獸':'第一章完成！繼續探索並收集怪獸';$('questText').textContent=text;$('questProgress').textContent=quest===0?'進度：0 / 1':quest===1?'進度：'+Math.min(defeated,2)+' / 2':quest===2?'進度：'+Math.min(captured,1)+' / 1':'獎勵：星塵 × 30';}
+function updateHUD(){$('hptext').textContent=Math.round(hp)+'/100';$('hpFill').style.width=hp+'%';$('levelText').textContent='Lv.'+level+' · 星塵 '+coins;$('monsterFill').style.width=Math.max(30,100-captured*12)+'%';updateQuest()}
+function attack(power=24){const e=nearEnemy();if(!e){toast('靠近野生怪獸再攻擊！');return}e.hp-=power;e.hit=.25;player.rotation.y=Math.atan2(e.g.position.x-player.position.x,e.g.position.z-player.position.z);if(e.hp<=0){e.alive=false;scene.remove(e.g);defeated++;coins+=5;xp+=25;toast(e.name+' 被擊退！星塵 +5');if(quest===1&&defeated>=2)quest=2;if(xp>=50){xp-=50;level++;toast('升級！現在 Lv.'+level)}save()}else toast('命中！ -'+power);updateHUD()}
+function skill(){const e=nearEnemy();if(!e){toast('靠近怪獸才能使用星光波');return}e.hp-=38;e.hit=.3;toast('星光波命中！');if(e.hp<=0){e.alive=false;scene.remove(e.g);defeated++;coins+=5;xp+=25;if(quest===1&&defeated>=2)quest=2;save()}updateHUD()}
+function capture(){const e=nearEnemy();if(!e){toast('靠近怪獸再嘗試馴服');return}if(e.hp>e.max*.45){toast('先削弱牠！體力低於 45% 才能馴服');return}if(Math.random()<.75){e.alive=false;scene.remove(e.g);captured++;coins+=3;discovered[e.name]=(discovered[e.name]||0)+1;xp+=20;toast('馴服成功！'+e.name+' 加入圖鑑');if(quest===2&&captured>=1)quest=3;save()}else toast('馴服失敗，再試一次！');updateHUD()}
+function interact(){const d=player.position.distanceTo(npc.position);if(d>4){toast('走近草原嚮導和藍色旗幟！');return}if(quest===0){quest=1;msg('嚮導：勇敢的馴獸師，先擊退兩隻野生怪獸吧！');toast('任務已更新');save()}else if(quest===1){msg('嚮導：草原上有怪獸，先用攻擊和星光波削弱牠們！')}else if(quest===2){msg('嚮導：把體力低的怪獸馴服，牠就會成為你的夥伴！')}else{coins+=10;msg('嚮導：做得好！送你星塵 × 10。');toast('星塵 +10');save()}updateHUD()}
+function openBook(){let rows=Object.keys(discovered);$('bookContent').innerHTML='<div class="entry">已馴服：'+captured+' 隻　擊退：'+defeated+' 隻<br>等級：Lv.'+level+'　星塵：'+coins+'</div>'+(rows.length?rows.map(n=>'<div class="entry">✦ '+n+' × '+discovered[n]+'</div>').join(''):'<div class="entry">還沒有收服紀錄。先削弱野生怪獸，再按「馴服」！</div>');$('book').style.display='flex'}
+$('bookBtn').onclick=openBook;$('closeBook').onclick=()=>$('book').style.display='none';$('interactBtn').onclick=interact;$('attackBtn').onpointerdown=e=>{e.preventDefault();attack(24+level*3)};$('skillBtn').onpointerdown=e=>{e.preventDefault();skill()};$('captureBtn').onpointerdown=e=>{e.preventDefault();capture()};
+$('startBtn').onclick=()=>{$('start').style.display='none';started=true;msg('先找藍色旗幟旁的草原嚮導，接取任務！')};
+window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'){e.preventDefault();attack(24+level*3)}if(e.key.toLowerCase()==='q')skill();if(e.key.toLowerCase()==='e')capture();if(e.key.toLowerCase()==='f')interact();if(e.key.toLowerCase()==='b')openBook()});window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+const zone=$('stickZone'),stick=$('stick');let pointer=null,center={x:0,y:0};zone.addEventListener('pointerdown',e=>{e.preventDefault();pointer=e.pointerId;zone.setPointerCapture(pointer);const r=zone.getBoundingClientRect();center={x:r.left+r.width/2,y:r.top+r.height/2};moveJoy(e)});zone.addEventListener('pointermove',e=>{if(pointer===e.pointerId)moveJoy(e)});function moveJoy(e){let dx=e.clientX-center.x,dy=e.clientY-center.y,l=Math.hypot(dx,dy),max=42;if(l>max){dx=dx/l*max;dy=dy/l*max}joy.x=dx/max;joy.y=dy/max;stick.style.transform=`translate(${dx}px,${dy}px)`}function resetJoy(){pointer=null;joy={x:0,y:0};stick.style.transform='translate(0,0)'}zone.addEventListener('pointerup',resetJoy);zone.addEventListener('pointercancel',resetJoy);
+player.position.set(0,0,4);camera.position.set(0,7,14);camera.lookAt(0,1,0);updateHUD();
+function animate(now){requestAnimationFrame(animate);let dt=Math.min((now-last)/1000,.04);last=now;if(started){let mx=joy.x+(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0),mz=joy.y+(keys.s||keys.arrowdown?1:0)-(keys.w||keys.arrowup?1:0),len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len}if(Math.abs(mx)+Math.abs(mz)>.05){player.position.x+=mx*7*dt;player.position.z+=mz*7*dt;player.rotation.y=Math.atan2(mx,mz);body.position.y=1.05+Math.sin(now*.014)*.04}player.position.x=THREE.MathUtils.clamp(player.position.x,-44,44);player.position.z=THREE.MathUtils.clamp(player.position.z,-48,44);let target=player.position.clone().add(new THREE.Vector3(-Math.sin(player.rotation.y)*1.7,0,-Math.cos(player.rotation.y)*1.7));companion.position.lerp(target,.07);companion.position.y=Math.abs(Math.sin(now*.006))*.12;companion.rotation.y=player.rotation.y;enemies.forEach(e=>{if(!e.alive)return;if(e.hit>0){e.hit-=dt;e.g.scale.setScalar(1.08)}else e.g.scale.setScalar(1);let d=e.g.position.distanceTo(player.position);if(d<10&&d>2.2){let dir=player.position.clone().sub(e.g.position).normalize();e.g.position.add(dir.multiplyScalar(dt*.65));e.g.rotation.y=Math.atan2(dir.x,dir.z)}else if(d<=2.2&&Math.random()<dt*.22){hp=Math.max(0,hp-3);if(hp<=0){hp=100;player.position.set(0,0,4);toast('回到營地，體力恢復！')}}});updateHUD()}const desired=new THREE.Vector3(player.position.x,player.position.y+5.5,player.position.z+9.5);camera.position.lerp(desired,.08);camera.lookAt(player.position.x,player.position.y+1.1,player.position.z-2.2);renderer.render(scene,camera)}
+requestAnimationFrame(animate);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5))});msg('探索草原，尋找藍色旗幟！');
 })();
-</script>
-</body>
-</html>
+</script></body></html>
